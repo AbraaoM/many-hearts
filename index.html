@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coração Móvel Disparando Corações Móveis</title>
+    <style>
+        body {
+            overflow: hidden;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        #coracaoPrincipal {
+            position: absolute;
+            font-size: 3em;
+            color: red;
+            user-select: none;
+        }
+
+        .coracaoPequeno {
+            position: absolute;
+            font-size: 1.5em;
+            color: pink;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="coracaoPrincipal">❤️</div>
+
+    <script>
+        const coracaoPrincipal = document.getElementById('coracaoPrincipal');
+        let xPrincipal = Math.random() * window.innerWidth;
+        let yPrincipal = Math.random() * window.innerHeight;
+        let dxPrincipal = (Math.random() - 0.5) * 2;
+        let dyPrincipal = (Math.random() - 0.5) * 2;
+        const velocidadePrincipal = 7; // Ajuste a velocidade do coração principal
+        let larguraPrincipal = coracaoPrincipal.offsetWidth;
+        let alturaPrincipal = coracaoPrincipal.offsetHeight;
+
+        const coracoesPequenos = [];
+        const velocidadePequenos = 3; // Ajuste a velocidade dos corações pequenos
+
+        function animarCoracaoPrincipal() {
+            xPrincipal += dxPrincipal * velocidadePrincipal;
+            yPrincipal += dyPrincipal * velocidadePrincipal;
+
+            if (xPrincipal + larguraPrincipal > window.innerWidth || xPrincipal < 0) {
+                dxPrincipal = -dxPrincipal;
+            }
+
+            if (yPrincipal + alturaPrincipal > window.innerHeight || yPrincipal < 0) {
+                dyPrincipal = -dyPrincipal;
+            }
+
+            coracaoPrincipal.style.left = xPrincipal + 'px';
+            coracaoPrincipal.style.top = yPrincipal + 'px';
+
+            // Disparar corações pequenos aleatoriamente
+            if (Math.random() < 0.01) { // Ajuste a frequência do disparo (0.01 = 1% por frame)
+                criarCoracaoPequeno(xPrincipal + larguraPrincipal / 2, yPrincipal + alturaPrincipal / 2);
+            }
+
+            requestAnimationFrame(animarCoracaoPrincipal);
+        }
+
+        function criarCoracaoPequeno(startX, startY) {
+            const novoCoracao = document.createElement('div');
+            novoCoracao.classList.add('coracaoPequeno');
+            novoCoracao.textContent = '💖';
+            document.body.appendChild(novoCoracao);
+
+            novoCoracao.style.left = startX - novoCoracao.offsetWidth / 2 + 'px';
+            novoCoracao.style.top = startY - novoCoracao.offsetHeight / 2 + 'px';
+
+            const angulo = Math.random() * 2 * Math.PI;
+            const vxPequeno = Math.cos(angulo) * velocidadePequenos * (Math.random() + 0.5);
+            const vyPequeno = Math.sin(angulo) * velocidadePequenos * (Math.random() + 0.5);
+
+            coracoesPequenos.push({
+                elemento: novoCoracao,
+                x: parseFloat(novoCoracao.style.left),
+                y: parseFloat(novoCoracao.style.top),
+                vx: vxPequeno,
+                vy: vyPequeno,
+                largura: novoCoracao.offsetWidth,
+                altura: novoCoracao.offsetHeight
+            });
+        }
+
+        function animarCoracoesPequenos() {
+            for (let i = 0; i < coracoesPequenos.length; i++) {
+                const coracao = coracoesPequenos[i];
+                coracao.x += coracao.vx;
+                coracao.y += coracao.vy;
+
+                // Rebatimento nas bordas
+                if (coracao.x + coracao.largura > window.innerWidth || coracao.x < 0) {
+                    coracao.vx = -coracao.vx;
+                }
+                if (coracao.y + coracao.altura > window.innerHeight || coracao.y < 0) {
+                    coracao.vy = -coracao.vy;
+                }
+
+                coracao.elemento.style.left = coracao.x + 'px';
+                coracao.elemento.style.top = coracao.y + 'px';
+            }
+            requestAnimationFrame(animarCoracoesPequenos);
+        }
+
+        window.onload = () => {
+            larguraPrincipal = coracaoPrincipal.offsetWidth;
+            alturaPrincipal = coracaoPrincipal.offsetHeight;
+            animarCoracaoPrincipal();
+            animarCoracoesPequenos();
+        };
+
+        window.addEventListener('resize', () => {
+            larguraPrincipal = coracaoPrincipal.offsetWidth;
+            alturaPrincipal = coracaoPrincipal.offsetHeight;
+        });
+    </script>
+</body>
+</html>
