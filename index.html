@@ -9,13 +9,19 @@
             overflow: hidden;
             margin: 0;
             background-color: #f0f0f0;
+            display: flex; /* Usar flexbox para centralizar */
+            justify-content: center; /* Centralizar horizontalmente */
+            align-items: center; /* Centralizar verticalmente */
+            min-height: 100vh; /* Garantir altura total da viewport */
+            position: relative; /* Para posicionar elementos absolutos dentro */
         }
 
         #coracaoPrincipal {
-            position: absolute;
+            position: absolute; /* Manter posicionamento absoluto para o movimento */
             font-size: 3em;
             color: red;
             user-select: none;
+            z-index: 10; /* Garantir que fique acima dos corações pequenos */
         }
 
         .coracaoPequeno {
@@ -23,6 +29,61 @@
             font-size: 1.5em;
             color: pink;
             user-select: none;
+            cursor: pointer; /* Indicar que é clicável */
+            transition: transform 0.2s ease-out, opacity 0.2s ease-out; /* Transição suave para burst */
+        }
+
+        /* Animação para o "burst" do coração pequeno */
+        .coracaoPequeno.bursting {
+            animation: heartBurst 0.5s ease-out forwards;
+        }
+
+        @keyframes heartBurst {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5) rotate(10deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(0) rotate(20deg);
+                opacity: 0;
+            }
+        }
+
+
+        .textoExplosao {
+            position: absolute;
+            font-size: 1em; /* Tamanho inicial pequeno */
+            color: #ff1493; /* Cor rosa choque */
+            font-weight: bold;
+            user-select: none;
+            opacity: 1; /* Opacidade inicial */
+            transform: translate(-50%, -50%) rotate(0deg); /* Centralizar e rotação inicial */
+            animation: crescerEsumir 1.5s ease-out forwards; /* Animação mais rápida */
+            z-index: 20; /* Garantir que fique acima de tudo */
+            pointer-events: none; /* Ignorar eventos de mouse no texto de explosão */
+            text-shadow: 0 0 5px #ff69b4, 0 0 10px #ff69b4; /* Sombra para efeito de brilho */
+        }
+
+        @keyframes crescerEsumir {
+            0% {
+                font-size: 1em;
+                opacity: 1;
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            30% {
+                 font-size: 4em; /* Cresce rápido no início */
+                 opacity: 1;
+                 transform: translate(-50%, -50%) rotate(5deg);
+            }
+            100% {
+                font-size: 8em; /* Continua crescendo enquanto some */
+                opacity: 0; /* Desaparece */
+                transform: translate(-50%, -50%) rotate(-5deg); /* Rotação final */
+            }
         }
     </style>
 </head>
@@ -42,10 +103,12 @@
         const coracoesPequenos = [];
         const velocidadePequenos = 3; // Ajuste a velocidade dos corações pequenos
 
+        // Função para animar o coração principal
         function animarCoracaoPrincipal() {
             xPrincipal += dxPrincipal * velocidadePrincipal;
             yPrincipal += dyPrincipal * velocidadePrincipal;
 
+            // Rebatimento nas bordas para o coração principal
             if (xPrincipal + larguraPrincipal > window.innerWidth || xPrincipal < 0) {
                 dxPrincipal = -dxPrincipal;
             }
@@ -65,20 +128,23 @@
             requestAnimationFrame(animarCoracaoPrincipal);
         }
 
+        // Função para criar um coração pequeno
         function criarCoracaoPequeno(startX, startY) {
             const novoCoracao = document.createElement('div');
             novoCoracao.classList.add('coracaoPequeno');
             novoCoracao.textContent = '💖';
             document.body.appendChild(novoCoracao);
 
+            // Posicionar o coração pequeno no centro do coração principal
             novoCoracao.style.left = startX - novoCoracao.offsetWidth / 2 + 'px';
             novoCoracao.style.top = startY - novoCoracao.offsetHeight / 2 + 'px';
 
+            // Definir velocidade e direção aleatórias para o coração pequeno
             const angulo = Math.random() * 2 * Math.PI;
             const vxPequeno = Math.cos(angulo) * velocidadePequenos * (Math.random() + 0.5);
             const vyPequeno = Math.sin(angulo) * velocidadePequenos * (Math.random() + 0.5);
 
-            coracoesPequenos.push({
+            const coracaoObj = {
                 elemento: novoCoracao,
                 x: parseFloat(novoCoracao.style.left),
                 y: parseFloat(novoCoracao.style.top),
@@ -86,36 +152,86 @@
                 vy: vyPequeno,
                 largura: novoCoracao.offsetWidth,
                 altura: novoCoracao.offsetHeight
+            };
+
+            coracoesPequenos.push(coracaoObj);
+
+            // Adicionar evento de clique ao coração pequeno
+            novoCoracao.addEventListener('click', () => {
+                // Adicionar classe para iniciar a animação de burst
+                coracaoObj.elemento.classList.add('bursting');
+
+                // Criar texto de explosão na posição do coração pequeno
+                criarTextoExplosao(coracaoObj.x + coracaoObj.largura / 2, coracaoObj.y + coracaoObj.altura / 2);
+
+                // Remover o elemento e do array após a animação de burst terminar
+                coracaoObj.elemento.addEventListener('animationend', () => {
+                     // Remover o elemento do coração pequeno do DOM
+                    coracaoObj.elemento.remove();
+
+                    // Remover o coração pequeno do array para parar a animação
+                    const index = coracoesPequenos.indexOf(coracaoObj);
+                    if (index > -1) {
+                        coracoesPequenos.splice(index, 1);
+                    }
+                });
             });
         }
 
+        // Função para animar os corações pequenos
         function animarCoracoesPequenos() {
-            for (let i = 0; i < coracoesPequenos.length; i++) {
+            // Iterar sobre os corações pequenos (usando um loop for decrescente para evitar problemas ao remover elementos)
+            for (let i = coracoesPequenos.length - 1; i >= 0; i--) {
                 const coracao = coracoesPequenos[i];
-                coracao.x += coracao.vx;
-                coracao.y += coracao.vy;
 
-                // Rebatimento nas bordas
-                if (coracao.x + coracao.largura > window.innerWidth || coracao.x < 0) {
-                    coracao.vx = -coracao.vx;
-                }
-                if (coracao.y + coracao.altura > window.innerHeight || coracao.y < 0) {
-                    coracao.vy = -coracao.vy;
-                }
+                // Só anima se não estiver explodindo
+                if (!coracao.elemento.classList.contains('bursting')) {
+                    coracao.x += coracao.vx;
+                    coracao.y += coracao.vy;
 
-                coracao.elemento.style.left = coracao.x + 'px';
-                coracao.elemento.style.top = coracao.y + 'px';
+                    // Rebatimento nas bordas para os corações pequenos
+                    if (coracao.x + coracao.largura > window.innerWidth || coracao.x < 0) {
+                        coracao.vx = -coracao.vx;
+                    }
+                    if (coracao.y + coracao.altura > window.innerHeight || coracao.y < 0) {
+                        coracao.vy = -coracao.vy;
+                    }
+
+                    coracao.elemento.style.left = coracao.x + 'px';
+                    coracao.elemento.style.top = coracao.y + 'px';
+                }
             }
             requestAnimationFrame(animarCoracoesPequenos);
         }
 
+        // Função para criar o texto de explosão
+        function criarTextoExplosao(x, y) {
+            const textoElemento = document.createElement('div');
+            textoElemento.classList.add('textoExplosao');
+            textoElemento.textContent = 'VIVI!'; // Texto que aparece na explosão
+            document.body.appendChild(textoElemento);
+
+            // Posicionar o texto no local da explosão
+            textoElemento.style.left = x + 'px';
+            textoElemento.style.top = y + 'px';
+
+            // Remover o elemento após a animação (já configurado no CSS)
+             textoElemento.addEventListener('animationend', () => {
+                textoElemento.remove();
+            });
+        }
+
+        // Inicialização quando a janela carrega
         window.onload = () => {
+            // Obter as dimensões do coração principal após o carregamento
             larguraPrincipal = coracaoPrincipal.offsetWidth;
             alturaPrincipal = coracaoPrincipal.offsetHeight;
+            // Iniciar as animações
             animarCoracaoPrincipal();
             animarCoracoesPequenos();
         };
 
+        // Atualizar dimensões do coração principal ao redimensionar a janela
         window.addEventListener('resize', () => {
             larguraPrincipal = coracaoPrincipal.offsetWidth;
             alturaPrincipal = coracaoPrincipal.offsetHeight;
