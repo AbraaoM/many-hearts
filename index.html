@@ -143,7 +143,7 @@
 </head>
 <body>
     <div id="pregnancyInfoContainer">
-        <div id="pregnancyLabel">Mini Nois</div>
+        <div id="pregnancyLabel">Mini Nóis</div>
         <div id="pregnancyProgressBarContainer">
             <div id="pregnancyProgressBar"></div>
             <div id="pregnancyProgressBarText"></div>
@@ -173,6 +173,10 @@
         const startDate = new Date('2025-03-27');
         const dueDate = new Date('2025-12-18');
         const totalDurationMs = dueDate.getTime() - startDate.getTime();
+
+        // Variáveis para alternar o texto de explosão
+        const explosionTexts = ['VIVI!', 'MINI NÓIS!']; // Suas duas opções de texto
+        let currentTextIndex = 0; // Índice do texto atual
 
         // Função para atualizar a barra de progresso baseada em datas
         function updateProgressBarBasedOnDate() {
@@ -302,7 +306,11 @@
         function criarTextoExplosao(x, y) {
             const textoElemento = document.createElement('div');
             textoElemento.classList.add('textoExplosao');
-            textoElemento.textContent = 'BOOM!'; // Texto que aparece na explosão
+
+            // Define o texto com base no índice atual e alterna para o próximo
+            textoElemento.textContent = explosionTexts[currentTextIndex];
+            currentTextIndex = (currentTextIndex + 1) % explosionTexts.length; // Alterna entre os textos
+
             document.body.appendChild(textoElemento);
 
             // Posicionar o texto no local da explosão
