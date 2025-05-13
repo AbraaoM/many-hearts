@@ -8,20 +8,75 @@
         body {
             overflow: hidden;
             margin: 0;
-            background-color: #f0f0f0;
-            display: flex; /* Usar flexbox para centralizar */
-            justify-content: center; /* Centralizar horizontalmente */
-            align-items: center; /* Centralizar verticalmente */
-            min-height: 100vh; /* Garantir altura total da viewport */
-            position: relative; /* Para posicionar elementos absolutos dentro */
+            background-color: #f0f0f0; /* Fundo claro */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+            font-family: 'Arial', sans-serif; /* Fonte mais suave */
         }
 
+        /* Container principal para a barra de progresso e a label */
+        #pregnancyInfoContainer {
+            position: absolute;
+            top: 8%; /* Ajusta a posição para acomodar a label acima */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%; /* Largura do container */
+            text-align: center; /* Centraliza o conteúdo (label e barra) */
+            z-index: 15; /* Acima dos corações */
+        }
+
+        /* Estilo para a label acima da barra de progresso */
+        #pregnancyLabel {
+            font-size: 1.2em;
+            color: #4682b4; /* Cor azul bebê */
+            margin-bottom: 5px; /* Espaço entre a label e a barra */
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5); /* Sombra no texto */
+        }
+
+        /* Estilo para a barra de progresso da gestação */
+        #pregnancyProgressBarContainer {
+            width: 100%; /* Ocupa a largura total do container pai */
+            height: 25px; /* Altura da barra */
+            border: 2px solid #add8e6; /* Borda azul bebê */
+            border-radius: 15px; /* Cantos arredondados */
+            overflow: hidden;
+            background-color: #e0ffff; /* Fundo azul claro */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra suave */
+            position: relative; /* Para posicionar o texto percentual absolutamente */
+        }
+
+        #pregnancyProgressBar {
+            height: 100%;
+            width: 0%; /* Começa com 0% de progresso */
+            background: linear-gradient(to right, #ffb6c1, #add8e6); /* Gradiente rosa e azul */
+            border-radius: 12px; /* Cantos arredondados internos */
+            transition: width 0.8s ease-in-out; /* Transição suave para o preenchimento */
+            /* Removido display: flex, justify-content, align-items daqui */
+        }
+
+         #pregnancyProgressBarText {
+            position: absolute; /* Posição absoluta para centralizar sobre a barra */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #4682b4; /* Cor do texto dentro da barra */
+            font-weight: bold;
+            font-size: 0.9em;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5); /* Sombra no texto */
+            z-index: 1; /* Garantir que o texto fique acima da barra de preenchimento */
+        }
+
+
         #coracaoPrincipal {
-            position: absolute; /* Manter posicionamento absoluto para o movimento */
+            position: absolute;
             font-size: 3em;
             color: red;
             user-select: none;
-            z-index: 10; /* Garantir que fique acima dos corações pequenos */
+            z-index: 10;
         }
 
         .coracaoPequeno {
@@ -29,8 +84,8 @@
             font-size: 1.5em;
             color: pink;
             user-select: none;
-            cursor: pointer; /* Indicar que é clicável */
-            transition: transform 0.2s ease-out, opacity 0.2s ease-out; /* Transição suave para burst */
+            cursor: pointer;
+            transition: transform 0.2s ease-out, opacity 0.2s ease-out;
         }
 
         /* Animação para o "burst" do coração pequeno */
@@ -53,19 +108,18 @@
             }
         }
 
-
         .textoExplosao {
             position: absolute;
-            font-size: 1em; /* Tamanho inicial pequeno */
-            color: #ff1493; /* Cor rosa choque */
+            font-size: 1em;
+            color: #ff1493;
             font-weight: bold;
             user-select: none;
-            opacity: 1; /* Opacidade inicial */
-            transform: translate(-50%, -50%) rotate(0deg); /* Centralizar e rotação inicial */
-            animation: crescerEsumir 1.5s ease-out forwards; /* Animação mais rápida */
-            z-index: 20; /* Garantir que fique acima de tudo */
-            pointer-events: none; /* Ignorar eventos de mouse no texto de explosão */
-            text-shadow: 0 0 5px #ff69b4, 0 0 10px #ff69b4; /* Sombra para efeito de brilho */
+            opacity: 1;
+            transform: translate(-50%, -50%) rotate(0deg);
+            animation: crescerEsumir 1.5s ease-out forwards;
+            z-index: 20;
+            pointer-events: none;
+            text-shadow: 0 0 5px #ff69b4, 0 0 10px #ff69b4;
         }
 
         @keyframes crescerEsumir {
@@ -75,19 +129,26 @@
                 transform: translate(-50%, -50%) rotate(0deg);
             }
             30% {
-                 font-size: 4em; /* Cresce rápido no início */
+                 font-size: 4em;
                  opacity: 1;
                  transform: translate(-50%, -50%) rotate(5deg);
             }
             100% {
-                font-size: 8em; /* Continua crescendo enquanto some */
-                opacity: 0; /* Desaparece */
-                transform: translate(-50%, -50%) rotate(-5deg); /* Rotação final */
+                font-size: 8em;
+                opacity: 0;
+                transform: translate(-50%, -50%) rotate(-5deg);
             }
         }
     </style>
 </head>
 <body>
+    <div id="pregnancyInfoContainer">
+        <div id="pregnancyLabel">Mini Nois</div>
+        <div id="pregnancyProgressBarContainer">
+            <div id="pregnancyProgressBar"></div>
+            <div id="pregnancyProgressBarText"></div>
+        </div>
+    </div>
     <div id="coracaoPrincipal">❤️</div>
 
     <script>
@@ -102,6 +163,36 @@
 
         const coracoesPequenos = [];
         const velocidadePequenos = 3; // Ajuste a velocidade dos corações pequenos
+
+        // Elementos da barra de progresso
+        const progressBar = document.getElementById('pregnancyProgressBar');
+        const progressBarText = document.getElementById('pregnancyProgressBarText');
+
+        // Dados da gestação (usando datas reais)
+        // Substitua pelas datas corretas da sua gestação
+        const startDate = new Date('2025-03-27');
+        const dueDate = new Date('2025-12-18');
+        const totalDurationMs = dueDate.getTime() - startDate.getTime();
+
+        // Função para atualizar a barra de progresso baseada em datas
+        function updateProgressBarBasedOnDate() {
+            const now = new Date();
+            const elapsedDurationMs = now.getTime() - startDate.getTime();
+            let progress = (elapsedDurationMs / totalDurationMs) * 100;
+
+            if (progress < 0) progress = 0;
+            if (progress > 100) progress = 100;
+
+            progressBar.style.width = progress + '%';
+            progressBarText.textContent = `${progress.toFixed(1)}%`;
+
+            if (progress < 100) {
+                requestAnimationFrame(updateProgressBarBasedOnDate);
+            } else {
+                 progressBarText.textContent = '100% - Bebê Chegou!';
+            }
+        }
+
 
         // Função para animar o coração principal
         function animarCoracaoPrincipal() {
@@ -122,7 +213,10 @@
 
             // Disparar corações pequenos aleatoriamente
             if (Math.random() < 0.01) { // Ajuste a frequência do disparo (0.01 = 1% por frame)
-                criarCoracaoPequeno(xPrincipal + larguraPrincipal / 2, yPrincipal + alturaPrincipal / 2);
+                // Garante que o coração principal esteja visível antes de disparar
+                if (coracaoPrincipal.style.display !== 'none') {
+                    criarCoracaoPequeno(xPrincipal + larguraPrincipal / 2, yPrincipal + alturaPrincipal / 2);
+                }
             }
 
             requestAnimationFrame(animarCoracaoPrincipal);
@@ -208,7 +302,7 @@
         function criarTextoExplosao(x, y) {
             const textoElemento = document.createElement('div');
             textoElemento.classList.add('textoExplosao');
-            textoElemento.textContent = 'VIVI!'; // Texto que aparece na explosão
+            textoElemento.textContent = 'BOOM!'; // Texto que aparece na explosão
             document.body.appendChild(textoElemento);
 
             // Posicionar o texto no local da explosão
@@ -221,21 +315,27 @@
             });
         }
 
-        // Inicialização quando a janela carrega
+        // Inicialização quando a janela carrega (única função onload)
         window.onload = () => {
             // Obter as dimensões do coração principal após o carregamento
             larguraPrincipal = coracaoPrincipal.offsetWidth;
             alturaPrincipal = coracaoPrincipal.offsetHeight;
-            // Iniciar as animações
+
+            // Iniciar as animações dos corações
             animarCoracaoPrincipal();
             animarCoracoesPequenos();
+
+            // Inicia a atualização da barra de progresso baseada em datas
+            updateProgressBarBasedOnDate();
         };
 
         // Atualizar dimensões do coração principal ao redimensionar a janela
         window.addEventListener('resize', () => {
             larguraPrincipal = coracaoPrincipal.offsetWidth;
             alturaPrincipal = coracaoPrincipal.offsetHeight;
+            // Nota: A barra de progresso já é responsiva devido à largura em %
         });
+
     </script>
 </body>
 </html>
